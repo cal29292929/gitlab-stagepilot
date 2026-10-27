@@ -1,0 +1,324 @@
+{
+  "run_id": "run-d3c00e83c5",
+  "project_name": "gitlab-stagepilot/payment-webhook-service",
+  "trigger_event": "gitlab_webhook:merge_request_and_pipeline_event",
+  "autonomy_mode": "hands_off",
+  "started_at_utc": "2026-10-26T20:57:07.350424+00:00",
+  "completed_at_utc": "2026-10-26T20:57:07.350588+00:00",
+  "stages_covered_count": 9,
+  "total_stages_available": 9,
+  "overall_status": "completed_autonomous",
+  "stage_results": [
+    {
+      "stage": "plan",
+      "stage_index": 1,
+      "agent_name": "stagepilot-orchestrator",
+      "model_used": "vertex_ai/gemini-2.5-flash",
+      "autonomy_mode": "hands_off",
+      "status": "completed",
+      "requires_human_approval": false,
+      "approved_automatically": true,
+      "summary": "Triaged GitLab Issue #42 ('Payment webhook signature bypass & CI timeout'), classified severity as HIGH (P1), mapped 4 acceptance criteria, and linked Epic & milestone.",
+      "actions_taken": [
+        "Parsed Issue #42 description and extracted affected modules (`auth/webhook_verifier.py`, `.gitlab-ci.yml`).",
+        "Assigned labels: `duo::autonomous`, `security::high`, `stage::plan`, `greenops::sci-tracked`.",
+        "Generated structured implementation & verification plan with blast-radius score 0.24 (low regression risk)."
+      ],
+      "artifacts": {
+        "issue_iid": 42,
+        "priority": "P1-High",
+        "blast_radius_score": 0.24,
+        "acceptance_criteria": [
+          "Enforce constant-time HMAC-SHA256 verification on webhook payloads",
+          "Eliminate SQL string interpolation in audit query",
+          "Add deterministic unit tests for invalid/expired signatures",
+          "Maintain SCI score under 18.0 gCO2eq/release"
+        ]
+      },
+      "energy_kwh": 0.0042,
+      "carbon_gco2eq": 1.052,
+      "baseline_carbon_gco2eq": 9.6544,
+      "duration_ms": 325,
+      "dco_signed_off": true
+    },
+    {
+      "stage": "create",
+      "stage_index": 2,
+      "agent_name": "stagepilot-orchestrator",
+      "model_used": "anthropic/claude-sonnet-4-5",
+      "autonomy_mode": "hands_off",
+      "status": "completed",
+      "requires_human_approval": false,
+      "approved_automatically": true,
+      "summary": "Opened & reviewed Merge Request !108 from commit `9f4b2c8e`, performed AST diff review, and committed DCO-signed refactoring patch.",
+      "actions_taken": [
+        "Created branch `duo/fix-issue-42` and opened Merge Request !108.",
+        "Executed GitLab Duo Code Review Flow across 3 modified files (+64 / -19 lines).",
+        "Committed surgical fix with `Signed-off-by: StagePilot Duo Agent <duo@gitlab.com>` (DCO 1.1)."
+      ],
+      "artifacts": {
+        "mr_iid": 108,
+        "source_branch": "duo/fix-issue-42",
+        "commit_sha": "9f4b2c8e",
+        "files_reviewed": [
+          "src/auth/webhook_verifier.py",
+          "src/db/audit_store.py",
+          "tests/test_webhook.py"
+        ],
+        "dco_trailer": "Signed-off-by: Kazutoshi Hayashi (LUMA LAB) <cal29792979@gmail.com>"
+      },
+      "energy_kwh": 0.0115,
+      "carbon_gco2eq": 2.0886,
+      "baseline_carbon_gco2eq": 13.2144,
+      "duration_ms": 370,
+      "dco_signed_off": true
+    },
+    {
+      "stage": "verify",
+      "stage_index": 3,
+      "agent_name": "ci-self-healer",
+      "model_used": "anthropic/claude-sonnet-4-5 + cached-ci-runner",
+      "autonomy_mode": "hands_off",
+      "status": "completed",
+      "requires_human_approval": false,
+      "approved_automatically": true,
+      "summary": "Detected failing CI job `pytest-integration` (missing fixture timeout & deprecated assert), synthesized self-healing patch + 3 new edge-case unit tests, and verified 100% green pipeline.",
+      "actions_taken": [
+        "Analyzed failed pipeline #8901 job trace via GitLab Duo Fix CI/CD Pipeline Flow.",
+        "Synthesized 3 regression unit tests covering replay attacks, malformed HMAC headers, and timeout recovery.",
+        "Pruned 2 unaffected integration shards via DAG impact analysis (saved 0.028 kWh runner energy).",
+        "Re-ran pipeline #8902: 24/24 tests passed (0 warnings, 96.4% coverage)."
+      ],
+      "artifacts": {
+        "healed_pipeline_id": 8902,
+        "previous_failed_pipeline_id": 8901,
+        "tests_executed": 24,
+        "tests_passed": 24,
+        "line_coverage_pct": 96.4,
+        "synthesized_tests": [
+          "test_verify_signature_rejects_tampered_hmac",
+          "test_verify_signature_rejects_expired_timestamp",
+          "test_parameterized_audit_query_prevents_sqli"
+        ]
+      },
+      "energy_kwh": 0.014,
+      "carbon_gco2eq": 2.4436,
+      "baseline_carbon_gco2eq": 20.3344,
+      "duration_ms": 415,
+      "dco_signed_off": true
+    },
+    {
+      "stage": "package",
+      "stage_index": 4,
+      "agent_name": "secops-remediator",
+      "model_used": "vertex_ai/gemini-2.5-flash + layer-cache",
+      "autonomy_mode": "hands_off",
+      "status": "completed",
+      "requires_human_approval": false,
+      "approved_automatically": true,
+      "summary": "Built multi-arch OCI container image with cached layers, pinned SHA256 digests, and generated CycloneDX 1.5 SBOM with SLSA Build Level 3 provenance.",
+      "actions_taken": [
+        "Generated CycloneDX 1.5 Software Bill of Materials (`sbom.cyclonedx.json`) enumerating 18 components.",
+        "Pinned base image `python:3.11-slim@sha256:4a9c...` to guarantee reproducible builds.",
+        "Published signed container image to GitLab Container Registry & Google Artifact Registry."
+      ],
+      "artifacts": {
+        "container_image": "us-central1-docker.pkg.dev/stagepilot/gitlab-stagepilot:9f4b2c8e",
+        "sbom_format": "CycloneDX-1.5",
+        "sbom_components_count": 18,
+        "slsa_provenance_level": "SLSA_BUILD_LEVEL_3"
+      },
+      "energy_kwh": 0.0085,
+      "carbon_gco2eq": 1.6626,
+      "baseline_carbon_gco2eq": 15.4394,
+      "duration_ms": 460,
+      "dco_signed_off": true
+    },
+    {
+      "stage": "secure",
+      "stage_index": 5,
+      "agent_name": "secops-remediator",
+      "model_used": "anthropic/claude-sonnet-4-5",
+      "autonomy_mode": "hands_off",
+      "status": "completed",
+      "requires_human_approval": false,
+      "approved_automatically": true,
+      "summary": "Scanned SAST, Secret Detection & Dependency reports; auto-remediated 2 findings (CWE-89 SQL Injection & CWE-347 Timing Side-Channel) and verified 0 remaining vulnerabilities.",
+      "actions_taken": [
+        "Parsed `gl-sast-report.json` and `gl-dependency-scanning-report.json`.",
+        "Auto-patched CWE-89 in `src/db/audit_store.py:44` using parameterized SQL queries.",
+        "Auto-patched CWE-347 in `src/auth/webhook_verifier.py:29` using `hmac.compare_digest`.",
+        "Re-ran SAST & Secret Detection scanners: 0 Critical, 0 High, 0 Medium vulnerabilities remaining."
+      ],
+      "artifacts": {
+        "findings_detected": 2,
+        "findings_remediated": 2,
+        "remaining_vulnerabilities": 0,
+        "remediated_cves": [
+          {
+            "id": "SAST-001",
+            "cwe": "CWE-89",
+            "severity": "CRITICAL",
+            "file": "src/db/audit_store.py",
+            "line": 44,
+            "before": "cursor.execute(f\"SELECT * FROM audit_logs WHERE actor = '{actor}'\")",
+            "after": "cursor.execute(\"SELECT * FROM audit_logs WHERE actor = ?\", (actor,))",
+            "status": "remediated"
+          },
+          {
+            "id": "SAST-002",
+            "cwe": "CWE-347",
+            "severity": "HIGH",
+            "file": "src/auth/webhook_verifier.py",
+            "line": 29,
+            "before": "return computed_sig == header_sig",
+            "after": "return hmac.compare_digest(computed_sig, header_sig)",
+            "status": "remediated"
+          }
+        ]
+      },
+      "energy_kwh": 0.012,
+      "carbon_gco2eq": 2.1596,
+      "baseline_carbon_gco2eq": 14.5494,
+      "duration_ms": 505,
+      "dco_signed_off": true
+    },
+    {
+      "stage": "release",
+      "stage_index": 6,
+      "agent_name": "stagepilot-orchestrator",
+      "model_used": "vertex_ai/gemini-2.5-flash",
+      "autonomy_mode": "hands_off",
+      "status": "completed",
+      "requires_human_approval": false,
+      "approved_automatically": true,
+      "summary": "Computed semantic version `v1.4.2`, generated structured changelog with CVE remediation notes, created GitLab Release tag, and initiated progressive canary rollout (10% -> 50% -> 100%).",
+      "actions_taken": [
+        "Merged Merge Request !108 after verifying green pipeline #8902 and zero security findings.",
+        "Tagged release `v1.4.2` via GitLab Releases API with automated changelog and SBOM attachment.",
+        "Promoted canary deployment on Google Cloud Run (`us-central1`) from 10% to 100% traffic."
+      ],
+      "artifacts": {
+        "release_tag": "v1.4.2",
+        "merged_mr_iid": 108,
+        "rollout_strategy": "canary-10-50-100",
+        "target_service": "gitlab-stagepilot-us-central1"
+      },
+      "energy_kwh": 0.0038,
+      "carbon_gco2eq": 0.9952,
+      "baseline_carbon_gco2eq": 8.3194,
+      "duration_ms": 550,
+      "dco_signed_off": true
+    },
+    {
+      "stage": "configure",
+      "stage_index": 7,
+      "agent_name": "greenops-sci-optimizer",
+      "model_used": "vertex_ai/gemini-2.5-flash + cloud-run-scale-to-zero",
+      "autonomy_mode": "hands_off",
+      "status": "completed",
+      "requires_human_approval": false,
+      "approved_automatically": true,
+      "summary": "Audited Google Cloud Run & Terraform configuration, right-sized container memory (2Gi -> 512Mi), enabled scale-to-zero (`min-instances=0`), and pinned workload to low-carbon `us-central1` region.",
+      "actions_taken": [
+        "Detected over-provisioned Cloud Run spec (2 vCPU / 2Gi RAM with 18% peak utilization).",
+        "Right-sized to 1 vCPU / 512Mi RAM with `min-instances=0`, `max-instances=3`, and CPU throttling enabled when idle.",
+        "Pinned deployment region to `us-central1` (142 gCO2eq/kWh wind-heavy grid vs 445 gCO2eq/kWh baseline)."
+      ],
+      "artifacts": {
+        "cloud_provider": "Google Cloud Run",
+        "region": "us-central1",
+        "cpu_limit": "1000m",
+        "memory_limit": "512Mi",
+        "min_instances": 0,
+        "max_instances": 3,
+        "iac_drift_status": "reconciled"
+      },
+      "energy_kwh": 0.005,
+      "carbon_gco2eq": 1.1656,
+      "baseline_carbon_gco2eq": 11.4344,
+      "duration_ms": 595,
+      "dco_signed_off": true
+    },
+    {
+      "stage": "monitor",
+      "stage_index": 8,
+      "agent_name": "ci-self-healer",
+      "model_used": "vertex_ai/gemini-2.5-flash",
+      "autonomy_mode": "hands_off",
+      "status": "completed",
+      "requires_human_approval": false,
+      "approved_automatically": true,
+      "summary": "Evaluated post-deployment Prometheus / Cloud Monitoring SLOs over 5-minute window: p95 latency 38.4ms (<150ms SLO), 5xx error rate 0.00% (<0.1% SLO). Deployment marked HEALTHY.",
+      "actions_taken": [
+        "Queried post-release golden signals (latency, traffic, errors, saturation) for release `v1.4.2`.",
+        "Verified p95 latency = 38.4ms, p99 latency = 61.2ms, error rate = 0.00%, CPU saturation = 29%.",
+        "Confirmed auto-rollback guard did not trip; locked release `v1.4.2` as stable production revision."
+      ],
+      "artifacts": {
+        "slo_status": "HEALTHY",
+        "p95_latency_ms": 38.4,
+        "p99_latency_ms": 61.2,
+        "error_rate_pct": 0.0,
+        "auto_rollback_triggered": false
+      },
+      "energy_kwh": 0.004,
+      "carbon_gco2eq": 1.0236,
+      "baseline_carbon_gco2eq": 10.0994,
+      "duration_ms": 640,
+      "dco_signed_off": true
+    },
+    {
+      "stage": "govern",
+      "stage_index": 9,
+      "agent_name": "greenops-sci-optimizer",
+      "model_used": "vertex_ai/gemini-2.5-flash",
+      "autonomy_mode": "hands_off",
+      "status": "completed",
+      "requires_human_approval": false,
+      "approved_automatically": true,
+      "summary": "Completed end-to-end compliance & sustainability governance: verified MIT License, DCO 1.1 sign-offs, AI Tool Governance policy adherence, and published ISO/IEC 21031 SCI sustainability attestation.",
+      "actions_taken": [
+        "Verified root `LICENSE` (MIT) and Developer Certificate of Origin (DCO 1.1) on all agent commits.",
+        "Audited agent tool invocations against `.gitlab/duo/tool-governance.yaml` (0 policy violations).",
+        "Computed ISO/IEC 21031:2024 SCI score and posted full 9-stage audit summary back to GitLab Issue & MR."
+      ],
+      "artifacts": {
+        "license_verified": "MIT",
+        "dco_compliant": true,
+        "policy_violations": 0,
+        "compliance_frameworks": [
+          "SOC2-CC8.1",
+          "SLSA-L3",
+          "ISO/IEC-21031:2024-SCI",
+          "DCO-1.1"
+        ]
+      },
+      "energy_kwh": 0.0035,
+      "carbon_gco2eq": 0.9526,
+      "baseline_carbon_gco2eq": 8.7644,
+      "duration_ms": 685,
+      "dco_signed_off": true
+    }
+  ],
+  "sci_report": {
+    "functional_unit_r": "1 complete 9-stage DevSecOps release lifecycle",
+    "energy_kwh_optimized": 0.0665,
+    "energy_kwh_baseline": 0.218,
+    "grid_intensity_gco2_kwh_optimized": 142.0,
+    "grid_intensity_gco2_kwh_baseline": 445.0,
+    "operational_emissions_o_gco2": 9.443,
+    "embodied_emissions_m_gco2": 4.1,
+    "sci_score_optimized_gco2_per_r": 13.543,
+    "sci_score_baseline_gco2_per_r": 111.81,
+    "carbon_saved_gco2": 98.267,
+    "reduction_percentage": 87.89,
+    "optimizations_applied": [
+      "Carbon-Aware Model Routing: Tiered inference routing between Vertex AI Gemini 2.5 Flash (stages: plan, package, release, configure, monitor, govern) and Anthropic Claude Sonnet 4.5 (stages: create, verify, secure), cutting AI inference energy by 69.5%.",
+      "Selective CI DAG Pruning & Dependency Layer Caching: Avoided redundant container rebuilds and skipped unaffected test shards in Verify/Package stages.",
+      "Low-Carbon Cloud Region Pinning (us-central1): Scheduled CI runners and Cloud Run workloads on renewable-heavy grid (142.0 vs 445.0 gCO2eq/kWh).",
+      "Scale-to-Zero Serverless Execution: Eliminated idle staging VM embodied & operational emissions via Google Cloud Run min-instances=0."
+    ]
+  },
+  "gitlab_summary_comment_markdown": "## \ud83e\udd16 GitLab StagePilot \u2014 9-Stage Autonomous DevSecOps Report (`run-d3c00e83c5`)\n\n- **Project:** `gitlab-stagepilot/payment-webhook-service`\n- **Trigger Event:** `gitlab_webhook:merge_request_and_pipeline_event`\n- **Autonomy Mode:** `HANDS_OFF`\n- **DevSecOps Stages Covered:** **`9 / 9` (100% Full Lifecycle Coverage)**\n\n### \ud83d\udccb 9-Stage Execution Matrix\n\n| # | Stage | Duo Agent | AI Model Routed | Status | Energy (kWh) | Carbon (gCO2eq) |\n| :-: | :--- | :--- | :--- | :---: | :---: | :---: |\n| 1 | **`PLAN`** | `stagepilot-orchestrator` | `vertex_ai/gemini-2.5-flash` | \u2705 Completed | `0.0042` | `1.05` (base `9.65`) |\n| 2 | **`CREATE`** | `stagepilot-orchestrator` | `anthropic/claude-sonnet-4-5` | \u2705 Completed | `0.0115` | `2.09` (base `13.21`) |\n| 3 | **`VERIFY`** | `ci-self-healer` | `anthropic/claude-sonnet-4-5 + cached-ci-runner` | \u2705 Completed | `0.0140` | `2.44` (base `20.33`) |\n| 4 | **`PACKAGE`** | `secops-remediator` | `vertex_ai/gemini-2.5-flash + layer-cache` | \u2705 Completed | `0.0085` | `1.66` (base `15.44`) |\n| 5 | **`SECURE`** | `secops-remediator` | `anthropic/claude-sonnet-4-5` | \u2705 Completed | `0.0120` | `2.16` (base `14.55`) |\n| 6 | **`RELEASE`** | `stagepilot-orchestrator` | `vertex_ai/gemini-2.5-flash` | \u2705 Completed | `0.0038` | `1.00` (base `8.32`) |\n| 7 | **`CONFIGURE`** | `greenops-sci-optimizer` | `vertex_ai/gemini-2.5-flash + cloud-run-scale-to-zero` | \u2705 Completed | `0.0050` | `1.17` (base `11.43`) |\n| 8 | **`MONITOR`** | `ci-self-healer` | `vertex_ai/gemini-2.5-flash` | \u2705 Completed | `0.0040` | `1.02` (base `10.10`) |\n| 9 | **`GOVERN`** | `greenops-sci-optimizer` | `vertex_ai/gemini-2.5-flash` | \u2705 Completed | `0.0035` | `0.95` (base `8.76`) |\n\n### \ud83c\udf31 Software Carbon Intensity (SCI) Sustainability Report (ISO/IEC 21031:2024)\n\n$$\\text{SCI} = \\frac{(E \\times I) + M}{R}$$\n\n- **Functional Unit ($R$):** 1 complete 9-stage DevSecOps release lifecycle\n- **Baseline SCI Score:** `111.81 gCO2eq / release`\n- **StagePilot Optimized SCI Score:** `13.54 gCO2eq / release`\n- **Net Carbon Reduction:** **`-98.27 gCO2eq` (`87.9%` reduction)**\n\n| Metric | Unoptimized Baseline | StagePilot GreenOps | Delta |\n| :--- | :---: | :---: | :---: |\n| Energy Consumed ($E$) | `0.2180 kWh` | `0.0665 kWh` | `-69.5%` |\n| Grid Carbon Intensity ($I$) | `445 gCO2eq/kWh` | `142 gCO2eq/kWh` | `-68.1%` |\n| Operational Emissions ($E \\times I$) | `97.01 gCO2eq` | `9.44 gCO2eq` | `-90.3%` |\n| Embodied Emissions ($M$) | `14.80 gCO2eq` | `4.10 gCO2eq` | `-72.3%` |\n| **Total SCI Score** | **`111.81 gCO2eq`** | **`13.54 gCO2eq`** | **`-87.9%`** |\n\n#### Applied GreenOps Optimizations\n- Carbon-Aware Model Routing: Tiered inference routing between Vertex AI Gemini 2.5 Flash (stages: plan, package, release, configure, monitor, govern) and Anthropic Claude Sonnet 4.5 (stages: create, verify, secure), cutting AI inference energy by 69.5%.\n- Selective CI DAG Pruning & Dependency Layer Caching: Avoided redundant container rebuilds and skipped unaffected test shards in Verify/Package stages.\n- Low-Carbon Cloud Region Pinning (us-central1): Scheduled CI runners and Cloud Run workloads on renewable-heavy grid (142.0 vs 445.0 gCO2eq/kWh).\n- Scale-to-Zero Serverless Execution: Eliminated idle staging VM embodied & operational emissions via Google Cloud Run min-instances=0.\n\n---\n*Signed-off-by: Kazutoshi Hayashi (LUMA LAB) <cal29792979@gmail.com> (DCO 1.1 | MIT License)*"
+}

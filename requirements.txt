@@ -1,0 +1,3 @@
+# Core StagePilot runs on Python 3.10+ standard library with zero external runtime dependencies.
+# Optional dev/test packages:
+pytest>=8.0.0

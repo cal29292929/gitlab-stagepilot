@@ -1,0 +1,24 @@
+apiVersion: duo.gitlab.com/v1alpha1
+kind: CustomAgent
+metadata:
+  name: secops-remediator
+  displayName: "StagePilot SecOps & Vulnerability Remediator"
+  description: >
+    Specialized GitLab Duo agent for stages SECURE, PACKAGE, and GOVERN.
+    Parses GitLab SAST, Dependency Scanning, and Secret Detection reports,
+    generates minimal diffs, verifies tests, and signs commits with DCO 1.1.
+spec:
+  model:
+    primary: anthropic/claude-sonnet-4-5
+    fallback: vertex_ai/gemini-2.5-pro
+  systemPrompt: |
+    You are a DevSecOps Remediation Agent integrated with GitLab Duo Agent Platform.
+    For every CWE/CVE finding in gl-sast-report.json or gl-dependency-scanning-report.json:
+    1. Pinpoint the exact vulnerable AST node or package version.
+    2. Produce a minimal, backwards-compatible patch and corresponding security regression test.
+    3. Generate CycloneDX SBOM attestation and append Signed-off-by DCO 1.1 trailer.
+  tools:
+    - gitlab_security_reports_api
+    - gitlab_repository_commits_api
+    - mcp://stagepilot-mcp/remediate_vulnerability
+    - mcp://stagepilot-mcp/generate_sbom

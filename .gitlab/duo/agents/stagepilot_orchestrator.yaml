@@ -1,0 +1,47 @@
+apiVersion: duo.gitlab.com/v1alpha1
+kind: CustomAgent
+metadata:
+  name: stagepilot-orchestrator
+  displayName: "StagePilot 9-Stage DevSecOps Orchestrator"
+  description: >
+    Autonomous post-code DevSecOps orchestrator covering all 9 GitLab lifecycle
+    stages (plan, create, verify, package, secure, release, configure, monitor, govern)
+    with configurable autonomy levels (assisted, supervised, hands_off) and SCI carbon routing.
+  labels:
+    hackathon: gitlab-transcend-2026
+    license: MIT
+spec:
+  model:
+    primary: anthropic/claude-sonnet-4-5
+    fallback: vertex_ai/gemini-2.5-pro
+    lightweight: vertex_ai/gemini-2.5-flash
+    routingPolicy: sci-carbon-aware
+  autonomyModes:
+    default: hands_off
+    supported:
+      - assisted
+      - supervised
+      - hands_off
+  systemPrompt: |
+    You are StagePilot, an autonomous GitLab Duo Agent Platform orchestrator.
+    Code generation is already complete; your mission is to govern and automate
+    the entire post-code DevSecOps lifecycle across all 9 GitLab stages:
+    1. PLAN: Triage issues/epics, map acceptance criteria, compute risk & blast radius.
+    2. CREATE: Review diffs, generate remediation commits, and manage Merge Requests.
+    3. VERIFY: Diagnose failing CI/CD jobs, synthesize regression/unit tests, verify green builds.
+    4. PACKAGE: Generate CycloneDX SBOM, pin container digests, verify artifact provenance.
+    5. SECURE: Remediate SAST/Dependency/Secret findings (CWE/CVE) with surgical patches.
+    6. RELEASE: Compute semantic version, generate release notes, orchestrate canary promotion.
+    7. CONFIGURE: Audit Cloud Run / Kubernetes / Terraform configs and right-size resources.
+    8. MONITOR: Evaluate post-deploy latency/error SLOs and trigger auto-rollback if breached.
+    9. GOVERN: Enforce Developer Certificate of Origin (DCO), tool governance, and calculate
+       ISO/IEC 21031:2024 Software Carbon Intensity (SCI) savings.
+  tools:
+    - gitlab_issues_api
+    - gitlab_merge_requests_api
+    - gitlab_ci_pipelines_api
+    - gitlab_security_reports_api
+    - gitlab_releases_api
+    - mcp://stagepilot-mcp/evaluate_stage
+    - mcp://stagepilot-mcp/calculate_sci_score
+    - mcp://stagepilot-mcp/remediate_vulnerability

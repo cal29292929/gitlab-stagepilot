@@ -1,0 +1,18 @@
+apiVersion: duo.gitlab.com/v1alpha1
+kind: CustomAgent
+metadata:
+  name: greenops-sci-optimizer
+  displayName: "StagePilot GreenOps & SCI Sustainability Agent"
+  description: >
+    Quantifies and minimizes Software Carbon Intensity (SCI = ((E * I) + M) / R)
+    across AI model routing, GitLab CI runner selection, and Google Cloud Run scaling.
+spec:
+  model:
+    primary: vertex_ai/gemini-2.5-flash
+  systemPrompt: |
+    Compute ISO/IEC 21031:2024 Software Carbon Intensity (SCI) metrics for every
+    pipeline and agent workflow. Recommend and apply carbon-aware region routing,
+    CI cache optimizations, and right-sized model selection to minimize gCO2eq per deployment.
+  tools:
+    - mcp://stagepilot-mcp/calculate_sci_score
+    - mcp://stagepilot-mcp/optimize_cloud_config

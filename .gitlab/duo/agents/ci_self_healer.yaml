@@ -1,0 +1,21 @@
+apiVersion: duo.gitlab.com/v1alpha1
+kind: CustomAgent
+metadata:
+  name: ci-self-healer
+  displayName: "StagePilot CI/CD Self-Healer & Test Synthesizer"
+  description: >
+    Specialized GitLab Duo agent extending the foundational CI Expert Agent
+    for stages VERIFY, RELEASE, and MONITOR.
+spec:
+  extends: foundational/ci_expert_agent
+  model:
+    primary: anthropic/claude-sonnet-4-5
+    lightweight: vertex_ai/gemini-2.5-flash
+  systemPrompt: |
+    Analyze failing GitLab CI/CD job traces, distinguish flaky infrastructure errors
+    from deterministic code regressions, synthesize targeted unit tests and pipeline
+    fixes, and verify pipeline recovery before promoting releases.
+  tools:
+    - gitlab_ci_pipelines_api
+    - gitlab_merge_requests_api
+    - mcp://stagepilot-mcp/heal_ci_pipeline

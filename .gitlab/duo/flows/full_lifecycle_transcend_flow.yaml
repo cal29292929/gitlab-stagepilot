@@ -1,0 +1,115 @@
+apiVersion: duo.gitlab.com/v1alpha1
+kind: CustomFlow
+metadata:
+  name: full-lifecycle-transcend-flow
+  displayName: "9-Stage Post-Code Autonomous DevSecOps Flow"
+  description: >
+    End-to-end GitLab Duo Flow orchestrating all 9 DevSecOps stages from Issue/Push
+    to Production Monitoring & SCI Sustainability Governance.
+spec:
+  triggers:
+    - type: webhook
+      events: [issue.open, merge_request.open, merge_request.update, pipeline.failed, deployment.completed]
+    - type: schedule
+      cron: "0 */6 * * *"
+    - type: manual
+      allowAutonomyOverride: true
+  inputs:
+    autonomy_mode:
+      type: string
+      enum: [assisted, supervised, hands_off]
+      default: hands_off
+    target_environment:
+      type: string
+      default: google-cloud-run-us-central1
+  steps:
+    - id: stage_1_plan
+      stage: plan
+      agent: stagepilot-orchestrator
+      action: triage_issue_and_plan
+      gate:
+        assisted: require_approval
+        supervised: auto_proceed
+        hands_off: auto_proceed
+
+    - id: stage_2_create
+      stage: create
+      agent: stagepilot-orchestrator
+      extendsFlow: foundational/code_review
+      action: review_and_create_mr_patch
+      dependsOn: [stage_1_plan]
+      gate:
+        assisted: require_approval
+        supervised: auto_proceed
+        hands_off: auto_proceed
+
+    - id: stage_3_verify
+      stage: verify
+      agent: ci-self-healer
+      extendsFlow: foundational/fix_pipeline
+      action: heal_pipeline_and_synthesize_tests
+      dependsOn: [stage_2_create]
+      gate:
+        assisted: require_approval
+        supervised: auto_proceed
+        hands_off: auto_proceed
+
+    - id: stage_4_package
+      stage: package
+      agent: secops-remediator
+      action: build_container_and_cyclonedx_sbom
+      dependsOn: [stage_3_verify]
+      gate:
+        assisted: require_approval
+        supervised: auto_proceed
+        hands_off: auto_proceed
+
+    - id: stage_5_secure
+      stage: secure
+      agent: secops-remediator
+      action: scan_and_patch_vulnerabilities
+      dependsOn: [stage_4_package]
+      gate:
+        assisted: require_approval
+        supervised: auto_proceed
+        hands_off: auto_proceed
+
+    - id: stage_6_release
+      stage: release
+      agent: stagepilot-orchestrator
+      action: cut_semver_release_and_changelog
+      dependsOn: [stage_5_secure]
+      gate:
+        assisted: require_approval
+        supervised: require_approval
+        hands_off: auto_proceed
+
+    - id: stage_7_configure
+      stage: configure
+      agent: greenops-sci-optimizer
+      action: rightsize_cloud_run_and_iac
+      dependsOn: [stage_6_release]
+      gate:
+        assisted: require_approval
+        supervised: auto_proceed
+        hands_off: auto_proceed
+
+    - id: stage_8_monitor
+      stage: monitor
+      agent: ci-self-healer
+      action: verify_post_deploy_slos
+      dependsOn: [stage_7_configure]
+      gate:
+        assisted: require_approval
+        supervised: auto_proceed
+        hands_off: auto_proceed
+
+    - id: stage_9_govern
+      stage: govern
+      agent: greenops-sci-optimizer
+      action: attest_compliance_and_sci_report
+      dependsOn: [stage_8_monitor]
+      gate:
+        assisted: require_approval
+        supervised: auto_proceed
+        hands_off: auto_proceed

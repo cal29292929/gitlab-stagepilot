@@ -1,0 +1,22 @@
+apiVersion: duo.gitlab.com/v1alpha1
+kind: CustomFlow
+metadata:
+  name: stagepilot-mr-security-review-flow
+  displayName: "Autonomous MR Security Remediation & SCI Audit Flow"
+spec:
+  extends: foundational/code_review
+  triggers:
+    - type: merge_request_event
+      actions: [open, update, reopen]
+  steps:
+    - id: sast_and_secret_triage
+      agent: secops-remediator
+      action: analyze_security_diff
+    - id: auto_commit_remediation
+      agent: secops-remediator
+      action: apply_cwe_remediation_patch
+      dependsOn: [sast_and_secret_triage]
+    - id: sci_impact_comment
+      agent: greenops-sci-optimizer
+      action: post_mr_sci_and_governance_summary
+      dependsOn: [auto_commit_remediation]

@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "stagepilot-mcp": {
+      "command": "python3",
+      "args": ["-m", "stagepilot.mcp_server"],
+      "env": {
+        "STAGEPILOT_MODE": "duo_mcp"
+      },
+      "description": "StagePilot MCP Server providing 9-stage DevSecOps automation, vulnerability remediation, and ISO/IEC 21031 SCI carbon telemetry tools to GitLab Duo Agent Platform.",
+      "tools": [
+        "evaluate_stage",
+        "run_full_lifecycle",
+        "remediate_vulnerability",
+        "heal_ci_pipeline",
+        "calculate_sci_score",
+        "generate_sbom"
+      ]
+    }
+  }
+}

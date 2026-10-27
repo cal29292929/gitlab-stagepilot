@@ -1,0 +1,45 @@
+# Google Cloud Build configuration for deploying GitLab StagePilot to Cloud Run
+# Eligible for the Google Cloud Deployment Bonus (+0.2 points)
+steps:
+  - name: 'python:3.11-slim'
+    id: 'unit-and-integration-tests'
+    entrypoint: 'python3'
+    args: ['-m', 'unittest', 'discover', '-s', 'tests', '-v']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-container-image'
+    args:
+      - 'build'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/stagepilot/gitlab-stagepilot:$COMMIT_SHA'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/stagepilot/gitlab-stagepilot:latest'
+      - '.'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-container-image'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/stagepilot/gitlab-stagepilot'
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-cloud-run'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'gitlab-stagepilot'
+      - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/stagepilot/gitlab-stagepilot:$COMMIT_SHA'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--cpu=1'
+      - '--memory=512Mi'
+      - '--min-instances=0'
+      - '--max-instances=3'
+      - '--set-env-vars=STAGEPILOT_AUTONOMY_MODE=hands_off,GCP_REGION=us-central1'
+
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/stagepilot/gitlab-stagepilot:$COMMIT_SHA'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/stagepilot/gitlab-stagepilot:latest'

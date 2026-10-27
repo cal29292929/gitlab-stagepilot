@@ -1,0 +1,30 @@
+apiVersion: duo.gitlab.com/v1alpha1
+kind: ToolGovernancePolicy
+metadata:
+  name: stagepilot-governance-policy
+spec:
+  enforceDcoSignoff: true
+  requireLicense: MIT
+  auditLogDestination: ".gitlab/duo/audit_trail.jsonl"
+  autonomyGates:
+    assisted:
+      requireHumanApprovalFor:
+        - plan
+        - create
+        - verify
+        - package
+        - secure
+        - release
+        - configure
+        - monitor
+        - govern
+    supervised:
+      requireHumanApprovalFor:
+        - release
+    hands_off:
+      requireHumanApprovalFor: []
+      autoRollbackOnSloBreach: true
+  forbiddenOperations:
+    - force_push_protected_branch
+    - disable_sast_scanner
+    - expose_raw_secrets

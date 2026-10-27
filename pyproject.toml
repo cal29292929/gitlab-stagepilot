@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gitlab-stagepilot"
+version = "1.0.0"
+description = "9-Stage Autonomous DevSecOps & SCI GreenOps Engine for GitLab Duo Agent Platform"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+  { name = "Kazutoshi Hayashi (LUMA LAB)", email = "cal29792979@gmail.com" }
+]
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]

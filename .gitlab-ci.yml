@@ -1,0 +1,156 @@
+# GitLab StagePilot: 9-Stage Autonomous DevSecOps & SCI GreenOps Pipeline
+# Life After Code: GitLab Transcend Hackathon (2026)
+# License: MIT | Author: Kazutoshi Hayashi (LUMA LAB)
+
+stages:
+  - plan
+  - create
+  - verify
+  - package
+  - secure
+  - release
+  - configure
+  - monitor
+  - govern
+
+variables:
+  PYTHONUNBUFFERED: "1"
+  STAGEPILOT_AUTONOMY_MODE: "hands_off"
+  GCP_REGION: "us-central1"
+  CLOUD_RUN_SERVICE: "gitlab-stagepilot"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  key: "${CI_COMMIT_REF_SLUG}-pip"
+  paths:
+    - .cache/pip
+
+# ---------------------------------------------------------------------------
+# STAGE 1: PLAN — Autonomous Issue Triage, Risk Scoring & Acceptance Criteria
+# ---------------------------------------------------------------------------
+duo_stage_1_plan:
+  stage: plan
+  image: python:3.11-slim
+  script:
+    - python3 -m stagepilot.cli run-stage --stage plan --autonomy "$STAGEPILOT_AUTONOMY_MODE" --output artifacts/stage_1_plan.json
+  artifacts:
+    paths:
+      - artifacts/stage_1_plan.json
+    expire_in: 7 days
+
+# ---------------------------------------------------------------------------
+# STAGE 2: CREATE — Automated Code Review Diff Analysis & MR Remediation
+# ---------------------------------------------------------------------------
+duo_stage_2_create:
+  stage: create
+  image: python:3.11-slim
+  needs: ["duo_stage_1_plan"]
+  script:
+    - python3 -m stagepilot.cli run-stage --stage create --autonomy "$STAGEPILOT_AUTONOMY_MODE" --output artifacts/stage_2_create.json
+  artifacts:
+    paths:
+      - artifacts/stage_2_create.json
+    expire_in: 7 days
+
+# ---------------------------------------------------------------------------
+# STAGE 3: VERIFY — Unit Tests, Self-Healing CI Pipeline & Test Synthesis
+# ---------------------------------------------------------------------------
+duo_stage_3_verify:
+  stage: verify
+  image: python:3.11-slim
+  needs: ["duo_stage_2_create"]
+  script:
+    - python3 -m unittest discover -s tests -v
+    - python3 -m stagepilot.cli run-stage --stage verify --autonomy "$STAGEPILOT_AUTONOMY_MODE" --output artifacts/stage_3_verify.json
+  artifacts:
+    paths:
+      - artifacts/stage_3_verify.json
+    expire_in: 7 days
+
+# ---------------------------------------------------------------------------
+# STAGE 4: PACKAGE — CycloneDX SBOM Generation & Container Provenance
+# ---------------------------------------------------------------------------
+duo_stage_4_package:
+  stage: package
+  image: python:3.11-slim
+  needs: ["duo_stage_3_verify"]
+  script:
+    - python3 -m stagepilot.cli run-stage --stage package --autonomy "$STAGEPILOT_AUTONOMY_MODE" --output artifacts/stage_4_package.json
+  artifacts:
+    paths:
+      - artifacts/stage_4_package.json
+      - artifacts/sbom.cyclonedx.json
+    expire_in: 7 days
+
+# ---------------------------------------------------------------------------
+# STAGE 5: SECURE — SAST / Secret / Dependency Vulnerability Auto-Patching
+# ---------------------------------------------------------------------------
+duo_stage_5_secure:
+  stage: secure
+  image: python:3.11-slim
+  needs: ["duo_stage_4_package"]
+  script:
+    - python3 -m stagepilot.cli run-stage --stage secure --autonomy "$STAGEPILOT_AUTONOMY_MODE" --output artifacts/stage_5_secure.json
+  artifacts:
+    paths:
+      - artifacts/stage_5_secure.json
+    expire_in: 7 days
+
+# ---------------------------------------------------------------------------
+# STAGE 6: RELEASE — SemVer Calculation, Changelog & Canary Rollout
+# ---------------------------------------------------------------------------
+duo_stage_6_release:
+  stage: release
+  image: python:3.11-slim
+  needs: ["duo_stage_5_secure"]
+  script:
+    - python3 -m stagepilot.cli run-stage --stage release --autonomy "$STAGEPILOT_AUTONOMY_MODE" --output artifacts/stage_6_release.json
+  artifacts:
+    paths:
+      - artifacts/stage_6_release.json
+    expire_in: 7 days
+
+# ---------------------------------------------------------------------------
+# STAGE 7: CONFIGURE — Google Cloud Run IaC Right-Sizing & Carbon Region Routing
+# ---------------------------------------------------------------------------
+duo_stage_7_configure:
+  stage: configure
+  image: python:3.11-slim
+  needs: ["duo_stage_6_release"]
+  script:
+    - python3 -m stagepilot.cli run-stage --stage configure --autonomy "$STAGEPILOT_AUTONOMY_MODE" --output artifacts/stage_7_configure.json
+  artifacts:
+    paths:
+      - artifacts/stage_7_configure.json
+    expire_in: 7 days
+
+# ---------------------------------------------------------------------------
+# STAGE 8: MONITOR — Post-Deployment SLO Verification & Auto-Rollback Guard
+# ---------------------------------------------------------------------------
+duo_stage_8_monitor:
+  stage: monitor
+  image: python:3.11-slim
+  needs: ["duo_stage_7_configure"]
+  script:
+    - python3 -m stagepilot.cli run-stage --stage monitor --autonomy "$STAGEPILOT_AUTONOMY_MODE" --output artifacts/stage_8_monitor.json
+  artifacts:
+    paths:
+      - artifacts/stage_8_monitor.json
+    expire_in: 7 days
+
+# ---------------------------------------------------------------------------
+# STAGE 9: GOVERN — DCO Attestation, Tool Governance & ISO/IEC 21031 SCI Report
+# ---------------------------------------------------------------------------
+duo_stage_9_govern:
+  stage: govern
+  image: python:3.11-slim
+  needs: ["duo_stage_8_monitor"]
+  script:
+    - python3 -m stagepilot.cli run-stage --stage govern --autonomy "$STAGEPILOT_AUTONOMY_MODE" --output artifacts/stage_9_govern.json
+    - python3 -m stagepilot.cli run-lifecycle --autonomy "$STAGEPILOT_AUTONOMY_MODE" --output artifacts/full_lifecycle_report.json
+  artifacts:
+    paths:
+      - artifacts/stage_9_govern.json
+      - artifacts/full_lifecycle_report.json
+      - artifacts/sci_sustainability_report.md
+    expire_in: 30 days

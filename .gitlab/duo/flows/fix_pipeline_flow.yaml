@@ -1,0 +1,22 @@
+apiVersion: duo.gitlab.com/v1alpha1
+kind: CustomFlow
+metadata:
+  name: stagepilot-fix-pipeline-flow
+  displayName: "Self-Healing CI/CD Pipeline Flow"
+spec:
+  extends: foundational/fix_pipeline
+  triggers:
+    - type: pipeline_event
+      statuses: [failed]
+  steps:
+    - id: diagnose_trace
+      agent: ci-self-healer
+      action: parse_job_log_and_classify_failure
+    - id: generate_fix_commit
+      agent: ci-self-healer
+      action: commit_self_healing_patch
+      dependsOn: [diagnose_trace]
+    - id: retrigger_and_verify
+      agent: ci-self-healer
+      action: trigger_pipeline_and_verify_green
+      dependsOn: [generate_fix_commit]
