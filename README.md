@@ -1,5 +1,11 @@
 # 🦊 GitLab StagePilot: 9-Stage Autonomous DevSecOps & SCI GreenOps Engine
 
+> **🎬 Official Demo Video (2m08s, 1080p MP4):**
+> - **GitHub Release Direct Stream/Download (`v1.4.2`):** [demo_video.mp4](https://github.com/cal29292929/gitlab-stagepilot/releases/download/v1.4.2/demo_video.mp4) ([Release v1.4.2 Page](https://github.com/cal29292929/gitlab-stagepilot/releases/tag/v1.4.2))
+> - **Google Drive Mirror:** [GitLab_StagePilot_Demo_Video.mp4](https://drive.google.com/file/d/1QHH72fT4HDkzsfWbAI48QXUhuVFxtxdI/view?usp=drivesdk)
+> - **In-Repo Asset:** [`submission_assets/demo_video.mp4`](submission_assets/demo_video.mp4)
+
+
 > **Life After Code: GitLab Transcend Hackathon (2026)**  
 > **Author:** Kazutoshi Hayashi (LUMA LAB) · **License:** [MIT](./LICENSE)  
 > **Track / Path:** Path A: Start Fresh · **Autonomy Level:** Hands-off (also supports Supervised & Assisted)  
